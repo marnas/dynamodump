@@ -221,6 +221,6 @@ utils/regression_test.js
 vendor/
 
 # for local builds
-dynamodbdump
+dynamodump
 # ignoring that one for now
 glide.lock

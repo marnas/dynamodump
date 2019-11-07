@@ -11,5 +11,6 @@ import:
   - service/dynamodb/dynamodbiface
   - service/s3
   - service/s3/s3manager
-- package: github.com/gobike/envflag
 - package: github.com/segmentio/ksuid
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper

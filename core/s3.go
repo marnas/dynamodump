@@ -1,4 +1,19 @@
-package main
+/*
+Copyright © 2019 AltoStack <info@altostack.io>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+package core
 
 import (
 	"bufio"
@@ -11,22 +26,21 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/segmentio/ksuid"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/segmentio/ksuid"
 )
 
-// S3ManifestEntry represents an entry in the backup manifest stored in the s3 folder of the backup
+// S3ManifestEntry represents an entry in the actions manifest stored in the s3 folder of the actions
 type S3ManifestEntry struct {
 	URL       string `json:"url"`
 	Mandatory bool   `json:"mandatory"`
 }
 
-// S3Manifest represents the backup manifest stored in the s3 folder of the backup
+// S3Manifest represents the actions manifest stored in the s3 folder of the actions
 type S3Manifest struct {
 	Name    string            `json:"name"`
 	Version int               `json:"version"`
@@ -45,7 +59,7 @@ func (h *AwsHelper) LoadManifestFromS3(bucketName, manifestPath string) error {
 	doc, err := h.GetFromS3(bucketName, manifestPath)
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == s3.ErrCodeNoSuchKey {
-			log.Fatalf("[ERROR] Unable to find a manifest flag in the provided folder. Are you sure the backup was successful?\nAborting...\n")
+			log.Fatalf("[ERROR] Unable to find a manifest flag in the provided folder. Are you sure the actions was successful?\nAborting...\n")
 		}
 		log.Fatalf("[ERROR] Unable to retrieve the manifest flag information: %s\nAborting...\n", err)
 	}
@@ -113,7 +127,7 @@ func (h *AwsHelper) UploadToS3(bucketName, s3Key string, data []byte) {
 	}
 }
 
-// ReaderToChannel reads the data from a backup line by line, serializes it and
+// ReaderToChannel reads the data from a actions line by line, serializes it and
 // sends it to the struct's channel
 func (h *AwsHelper) ReaderToChannel(dataReader *io.ReadCloser) error {
 	defer (*dataReader).Close()
@@ -186,9 +200,9 @@ func (h *AwsHelper) ChannelToS3(bucketName, s3Folder string, s3BufferSize int) {
 
 	// Upload the rest of the buffer
 	h.DumpBuffer(bucketName, s3Folder, &buff)
-	// Signal the success of the backup
+	// Signal the success of the actions
 	h.UploadToS3(bucketName, fmt.Sprintf("%s/_SUCCESS", s3Folder), []byte{})
-	// Wrap up the manifest of the backup files
+	// Wrap up the manifest of the actions files
 	manifestData, err := json.Marshal(h.ManifestS3)
 	if err != nil {
 		log.Fatalf("[ERROR] while doing a marshal on the manifest: %v\nError: %s\n", h.ManifestS3, err)
