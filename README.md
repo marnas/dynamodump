@@ -34,3 +34,9 @@ architecture without additional costs.
 ## How to use it?
 
 🏗 WIP 🚧
+
+## Todo
+
+- [ ] Cross Region Support (DynamoDB Table and S3 Bucket can be in different AWS regions)
+- [ ] Cross Account Support (DynamoDB Table and S3 Bucket can be in different AWS accounts)
+- [ ] Flag to force restore even if the `_SUCCESS` file is absent

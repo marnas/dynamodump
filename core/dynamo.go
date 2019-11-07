@@ -70,7 +70,7 @@ func NewAwsHelper() *AwsHelper {
 }
 
 // TableToChannel scans an entire DynamoDB table, putting all the output records to a
-// given channel and increment a given waitgroup
+// given channel and increment a given wait group
 func (h *AwsHelper) TableToChannel(tableName string, batchSize int64, waitPeriod time.Duration) error {
 	h.Wg.Add(1)
 
@@ -125,7 +125,7 @@ func (h *AwsHelper) CheckTableEmpty(tbl string) (int64, error) {
 
 	result, err := h.DynamoSvc.DescribeTable(input)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == dynamodb.ErrCodeResourceNotFoundException {
+		if err, ok := err.(awserr.Error); ok && err.Code() == dynamodb.ErrCodeResourceNotFoundException {
 			return -1, nil
 		}
 		return -10, err
