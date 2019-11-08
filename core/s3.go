@@ -47,7 +47,7 @@ type S3Manifest struct {
 	Entries []S3ManifestEntry `json:"entries"`
 }
 
-// genNewFileName returns a UUID used by the datapipelines
+// genNewFileName returns a UUID used by the data pipelines
 func genNewFileName() string {
 	uuID := hex.EncodeToString(ksuid.New().Payload())
 	return fmt.Sprintf("%s-%s-%s-%s-%s", uuID[:8], uuID[8:12], uuID[12:16], uuID[16:20], uuID[20:])
@@ -58,7 +58,7 @@ func genNewFileName() string {
 func (h *AwsHelper) LoadManifestFromS3(bucketName, manifestPath string) error {
 	doc, err := h.GetFromS3(bucketName, manifestPath)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == s3.ErrCodeNoSuchKey {
+		if err, ok := err.(awserr.Error); ok && err.Code() == s3.ErrCodeNoSuchKey {
 			log.Fatalf("[ERROR] Unable to find a manifest flag in the provided folder. Are you sure the actions was successful?\nAborting...\n")
 		}
 		log.Fatalf("[ERROR] Unable to retrieve the manifest flag information: %s\nAborting...\n", err)

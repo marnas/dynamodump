@@ -6,6 +6,7 @@
   * [What is it?](#what-is-it)
   * [Why creating this tool?](#why-creating-this-tool)
   * [How to use it?](#how-to-use-it)
+  * [Todo](#todo)
   * [Contributing to the project](#contributing-to-the-project)
   
 ## Background
@@ -40,3 +41,12 @@ architecture without additional costs.
 - [ ] Cross Region Support (DynamoDB Table and S3 Bucket can be in different AWS regions)
 - [ ] Cross Account Support (DynamoDB Table and S3 Bucket can be in different AWS accounts)
 - [ ] Flag to force restore even if the `_SUCCESS` file is absent
+- [ ] Ability to define S3 `StorageClass` of backed up files
+
+## Contributing to the project
+
+Anybody is more than welcome to create PR if you want to contribute to the project. A minimal testing and explanations about the problem will be asked but that's for sanity purposes.
+
+We're friendly people, we won't bite if the code is not done the way we like! :)
+
+If you don't have a lot of ideas but still want to contribute, we maintain a list of ideas we want to explore in the [Todo](#todo) section, you can start here!
