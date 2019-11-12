@@ -42,6 +42,7 @@ architecture without additional costs.
 - [ ] Cross Account Support (DynamoDB Table and S3 Bucket can be in different AWS accounts)
 - [ ] Flag to force restore even if the `_SUCCESS` file is absent
 - [ ] Ability to define S3 `StorageClass` of backed up files
+- [ ] Ability to backup all DynamoDB Tables (Based on AWS Tags)
 
 ## Contributing to the project
 
