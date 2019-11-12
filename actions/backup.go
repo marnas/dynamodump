@@ -17,6 +17,7 @@ package actions
 
 import (
 	"log"
+	"strings"
 	"time"
 
 	"github.com/AltoStack/dynamodump/core"
@@ -24,18 +25,24 @@ import (
 
 // Table manages the consumer from a given DynamoDB table and a producer
 // to a given s3 bucket
-func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, addDate bool) {
+func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, addDate bool, origin string, destination string) {
 	if addDate {
 		t := time.Now().UTC()
 		prefix += "/" + t.Format("2006-01-02-15-04-05")
 	}
 
-	proc := core.NewAwsHelper()
-	go proc.ChannelToS3(bucket, prefix, 10*1024*1024)
+	originSplit := strings.Split(origin, "@")
+	destinationSplit := strings.Split(destination, "@")
+
+	proc := core.NewAwsHelper(originSplit[0], originSplit[1])
+	dest := core.NewAwsHelper(destinationSplit[0], destinationSplit[1])
+
+	go proc.ChannelToS3(bucket, prefix, 10*1024*1024, dest)
 
 	err := proc.TableToChannel(tableName, batchSize, waitPeriod)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
 	proc.Wg.Wait()
 }

@@ -31,6 +31,8 @@ var (
 	s3BucketFolderName  string
 	s3DateSuffix        bool
 	waitTime            int64
+	origin              string
+	destination         string
 )
 
 var rootCmd = &cobra.Command{

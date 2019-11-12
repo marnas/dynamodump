@@ -177,11 +177,11 @@ func (h *AwsHelper) DumpBuffer(bucketName, s3Folder string, buff *bytes.Buffer) 
 
 // ChannelToS3 reads from the given channel and sends the data the given bucket
 // in files of s3BufferSize max size
-func (h *AwsHelper) ChannelToS3(bucketName, s3Folder string, s3BufferSize int) {
+func (h *AwsHelper) ChannelToS3(bucketName, s3Folder string, s3BufferSize int, destination *AwsHelper) {
 	defer h.Wg.Done()
 	// buff is the buffer where the data will be stored while before being sent to s3
 	var buff bytes.Buffer
-	h.ManifestS3 = S3Manifest{Version: 3, Name: "DynamoDB-export"}
+	destination.ManifestS3 = S3Manifest{Version: 3, Name: "DynamoDB-export"}
 
 	for elem := range h.DataPipe {
 		data, err := MarshalDynamoAttributeMap(elem)
@@ -191,7 +191,7 @@ func (h *AwsHelper) ChannelToS3(bucketName, s3Folder string, s3BufferSize int) {
 
 		// before overflowing the buffer, dump to s3 and empty it
 		if buff.Len()+len(data) >= s3BufferSize && buff.Len() > 0 {
-			h.DumpBuffer(bucketName, s3Folder, &buff)
+			destination.DumpBuffer(bucketName, s3Folder, &buff)
 		}
 		// add the data to the buffer
 		buff.Write(data)
@@ -199,13 +199,13 @@ func (h *AwsHelper) ChannelToS3(bucketName, s3Folder string, s3BufferSize int) {
 	}
 
 	// Upload the rest of the buffer
-	h.DumpBuffer(bucketName, s3Folder, &buff)
+	destination.DumpBuffer(bucketName, s3Folder, &buff)
 	// Signal the success of the actions
-	h.UploadToS3(bucketName, fmt.Sprintf("%s/_SUCCESS", s3Folder), []byte{})
+	destination.UploadToS3(bucketName, fmt.Sprintf("%s/_SUCCESS", s3Folder), []byte{})
 	// Wrap up the manifest of the actions files
-	manifestData, err := json.Marshal(h.ManifestS3)
+	manifestData, err := json.Marshal(destination.ManifestS3)
 	if err != nil {
-		log.Fatalf("[ERROR] while doing a marshal on the manifest: %v\nError: %s\n", h.ManifestS3, err)
+		log.Fatalf("[ERROR] while doing a marshal on the manifest: %v\nError: %s\n", destination.ManifestS3, err)
 	}
-	h.UploadToS3(bucketName, fmt.Sprintf("%s/manifest", s3Folder), manifestData)
+	destination.UploadToS3(bucketName, fmt.Sprintf("%s/manifest", s3Folder), manifestData)
 }

@@ -60,10 +60,24 @@ type AwsHelper struct {
 
 // NewAwsHelper creates a new AwsHelper, initializing an AWS session and a few
 // objects like a channel or a DynamoDB client
-func NewAwsHelper() *AwsHelper {
-	awsSess := session.Must(session.NewSessionWithOptions(session.Options{
+func NewAwsHelper(profile string, region string) *AwsHelper {
+	awsSess, err := session.NewSessionWithOptions(session.Options{
+		// Specify profile to load for the session's config
+		Profile: profile,
+
+		// Provide SDK Config options, such as Region.
+		Config: aws.Config{
+			Region: aws.String(region),
+		},
+
+		// Force enable Shared Config support
 		SharedConfigState: session.SharedConfigEnable,
-	}))
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	dataPipe := make(chan map[string]*dynamodb.AttributeValue)
 	dynamoSvc := dynamodb.New(awsSess)
 	return &AwsHelper{AwsSession: awsSess, DataPipe: dataPipe, DynamoSvc: dynamoSvc}

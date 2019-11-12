@@ -24,7 +24,7 @@ import (
 )
 
 func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, appendToTable bool) {
-	proc := core.NewAwsHelper()
+	proc := core.NewAwsHelper("", "")
 
 	// Check if the table exists and has data in it. If so, abort
 	itemsCount, err := proc.CheckTableEmpty(tableName)
