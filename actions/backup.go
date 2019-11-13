@@ -25,7 +25,7 @@ import (
 
 // Table manages the consumer from a given DynamoDB table and a producer
 // to a given s3 bucket
-func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, addDate, crossRegions bool, dynamoRegion string, s3Region string) {
+func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, addDate, crossRegions bool, dynamoRegion, s3Region string) {
 	if addDate {
 		t := time.Now().UTC()
 		prefix += "/" + t.Format("2006-01-02-15-04-05")
