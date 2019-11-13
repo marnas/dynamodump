@@ -63,6 +63,7 @@ Flags:
 Example:
 
 ```shell script
+export AWS_PROFILE=awesome-profile
 ./dynamodump backup \
   -t table-name \
   -o eu-west-1 \
@@ -79,6 +80,8 @@ Example:
 - [ ] Ability to define S3 `StorageClass` of backed up files
 - [ ] Ability to backup all DynamoDB Tables (Based on AWS Tags)
 - [x] Integrate https://goreleaser.com/
+- [x] Migrate to https://github.com/spf13/cobra & https://github.com/spf13/viper
+
 
 ## Contributing to the project
 
