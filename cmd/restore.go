@@ -26,19 +26,22 @@ import (
 func init() {
 	rootCmd.AddCommand(restoreCmd)
 
-	restoreCmd.Flags().StringVarP(&dynamoTableName, "dynamo-table-name", "t", "", "Name of the Dynamo table to actions. Environment variable: DYN_DYNAMO_TABLE_NAME")
+	restoreCmd.Flags().StringVarP(&dynamoTableName, "dynamo-table-name", "t", "", "Name of the Dynamo table to actions. Environment variable: DYN_DYNAMO_TABLE_NAME (required)")
 	restoreCmd.Flags().Int64VarP(&dynamoBatchSize, "dynamo-table-batch-size", "s", 1000, "Max number of records to read from the Dynamo table at once. Environment variable: DYN_DYNAMO_TABLE_BATCH_SIZE")
 	restoreCmd.Flags().BoolVarP(&dynamoAppendRestore, "dynamo-append-restore", "a", false, "Appends the rows to a non-empty table when restoring instead of aborting. Environment variable: DYN_DYNAMO_RESTORE_APPEND")
 	restoreCmd.Flags().Int64VarP(&waitTime, "dynamo-table-batch-wait-time", "w", 100, "Number of milliseconds to wait between batches. If a ProvisionedThroughputExceededException is encountered, "+
 		"the script will wait twice that amount of time before retrying. Environment variable: DYN_WAIT_TIME")
-	restoreCmd.Flags().StringVarP(&s3BucketName, "s3-bucket-name", "b", "", "Name of the S3 bucket where to put the actions. Environment variable: DYN_S3_BUCKET_NAME")
-	restoreCmd.Flags().StringVarP(&s3BucketFolderName, "s3-bucket-folder-name", "f", "", "Path inside the S3 bucket where to put actions. Environment variable: DYN_S3_BUCKET_FOLDER_NAME")
+	restoreCmd.Flags().StringVarP(&s3BucketName, "s3-bucket-name", "b", "", "Name of the S3 bucket where to put the actions. Environment variable: DYN_S3_BUCKET_NAME (required)")
+	restoreCmd.Flags().StringVarP(&s3BucketFolderName, "s3-bucket-folder-name", "f", "", "Path inside the S3 bucket where to put actions. Environment variable: DYN_S3_BUCKET_FOLDER_NAME (required)")
+
+	backupCmd.MarkFlagRequired("dynamo-table-name")
+	backupCmd.MarkFlagRequired("s3-bucket-name")
+	backupCmd.MarkFlagRequired("s3-bucket-folder-name")
 }
 
 var restoreCmd = &cobra.Command{
 	Use:   "restore",
 	Short: "Restore a DynamoDB Table from S3",
-	Long:  `WIP`,
 	Run: func(cmd *cobra.Command, args []string) {
 		actions.TableRestore(dynamoTableName, dynamoBatchSize, time.Duration(waitTime)*time.Millisecond, s3BucketName, s3BucketFolderName, dynamoAppendRestore)
 	},

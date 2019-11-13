@@ -17,7 +17,6 @@ package actions
 
 import (
 	"log"
-	"os"
 	"time"
 
 	"github.com/AltoStack/dynamodump/core"
@@ -25,20 +24,14 @@ import (
 
 // Table manages the consumer from a given DynamoDB table and a producer
 // to a given s3 bucket
-func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, addDate, crossRegions bool, dynamoRegion, s3Region string) {
+func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, addDate bool, dynamoRegion, s3Region string) {
 	if addDate {
 		t := time.Now().UTC()
 		prefix += "/" + t.Format("2006-01-02-15-04-05")
 	}
 
-	if crossRegions {
-		if dynamoRegion == "" || s3Region == "" {
-			log.Fatal("Error. Missing fields dynamoRegion or s3Region with cross regions flag enabled")
-			os.Exit(-1)
-		}
-	} else if dynamoRegion != "" || s3Region != "" {
-		log.Fatal("Error. Cross regions disabled, please either enable it or remove s3-bucket-region and dynamo-table-region flags")
-		os.Exit(-1)
+	if dynamoRegion == "" || s3Region == "" {
+		log.Fatal("Error. Missing fields dynamoRegion or s3Region")
 	}
 
 	proc := core.NewAwsHelper(dynamoRegion)
