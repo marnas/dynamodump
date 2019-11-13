@@ -24,7 +24,6 @@ import (
 )
 
 var (
-	crossRegions        bool
 	dynamoTableName     string
 	dynamoBatchSize     int64
 	dynamoAppendRestore bool

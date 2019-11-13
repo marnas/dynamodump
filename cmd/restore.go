@@ -38,7 +38,6 @@ func init() {
 var restoreCmd = &cobra.Command{
 	Use:   "restore",
 	Short: "Restore a DynamoDB Table from S3",
-	Long:  `WIP`,
 	Run: func(cmd *cobra.Command, args []string) {
 		actions.TableRestore(dynamoTableName, dynamoBatchSize, time.Duration(waitTime)*time.Millisecond, s3BucketName, s3BucketFolderName, dynamoAppendRestore)
 	},
