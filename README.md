@@ -43,6 +43,7 @@ architecture without additional costs.
 - [ ] Flag to force restore even if the `_SUCCESS` file is absent
 - [ ] Ability to define S3 `StorageClass` of backed up files
 - [ ] Ability to backup all DynamoDB Tables (Based on AWS Tags)
+- [ ] Integrate https://goreleaser.com/
 
 ## Contributing to the project
 
