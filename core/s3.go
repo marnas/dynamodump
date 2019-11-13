@@ -28,8 +28,10 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/segmentio/ksuid"
 )
@@ -75,7 +77,7 @@ func (h *AwsHelper) LoadManifestFromS3(bucketName, manifestPath string) error {
 // GetFromS3 download a file from s3 to memory (as the files are small by
 // default - just a few Mb).
 func (h *AwsHelper) GetFromS3(bucketName, s3Path string) (*io.ReadCloser, error) {
-	svc := s3.New(h.AwsSession)
+	svc := h.CreateServiceClientValue()
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(s3Path),
@@ -90,7 +92,7 @@ func (h *AwsHelper) GetFromS3(bucketName, s3Path string) (*io.ReadCloser, error)
 
 // ExistsInS3 checks that a given path in s3 exists as a file
 func (h *AwsHelper) ExistsInS3(bucketName, s3Path string) (bool, error) {
-	svc := s3.New(h.AwsSession)
+	svc := h.CreateServiceClientValue()
 	input := &s3.HeadObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(s3Path),
@@ -208,4 +210,13 @@ func (h *AwsHelper) ChannelToS3(bucketName, s3Folder string, s3BufferSize int, d
 		log.Fatalf("[ERROR] while doing a marshal on the manifest: %v\nError: %s\n", destination.ManifestS3, err)
 	}
 	destination.UploadToS3(bucketName, fmt.Sprintf("%s/manifest", s3Folder), manifestData)
+}
+
+// Check if credentials has been initialised and return a Service Client Value
+func (h *AwsHelper) CreateServiceClientValue() s3iface.S3API {
+	if h.RoleCreds == (credentials.Credentials{}) {
+		return s3.New(h.AwsSession)
+	} else {
+		return s3.New(h.AwsSession, &aws.Config{Credentials: &h.RoleCreds})
+	}
 }

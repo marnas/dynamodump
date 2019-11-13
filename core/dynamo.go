@@ -24,6 +24,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/client"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
@@ -56,14 +58,15 @@ type AwsHelper struct {
 	Wg         sync.WaitGroup
 	DataPipe   chan map[string]*dynamodb.AttributeValue
 	ManifestS3 S3Manifest
+	RoleCreds  credentials.Credentials
 }
 
 // NewAwsHelper creates a new AwsHelper, initializing an AWS session and a few
 // objects like a channel or a DynamoDB client
-func NewAwsHelper(region string) *AwsHelper {
+func NewAwsHelper(profile, region, accountID, accountRole string) *AwsHelper {
 	awsSess, err := session.NewSessionWithOptions(session.Options{
 		// Specify profile to load for the session's config - temporarily commented out
-		//Profile: profile,
+		Profile: profile,
 
 		// Provide SDK Config options, such as Region.
 		Config: aws.Config{
@@ -79,8 +82,18 @@ func NewAwsHelper(region string) *AwsHelper {
 	}
 
 	dataPipe := make(chan map[string]*dynamodb.AttributeValue)
-	dynamoSvc := dynamodb.New(awsSess)
-	return &AwsHelper{AwsSession: awsSess, DataPipe: dataPipe, DynamoSvc: dynamoSvc}
+
+	var dynamoSvc dynamodbiface.DynamoDBAPI
+	var creds credentials.Credentials
+
+	if accountID != "" {
+		arn := "arn:aws:iam::" + accountID + ":role/" + accountRole
+		creds = *stscreds.NewCredentials(awsSess, arn)
+		dynamoSvc = dynamodb.New(awsSess, &aws.Config{Credentials: &creds})
+	} else {
+		dynamoSvc = dynamodb.New(awsSess)
+	}
+	return &AwsHelper{AwsSession: awsSess, DataPipe: dataPipe, DynamoSvc: dynamoSvc, RoleCreds: creds}
 }
 
 // TableToChannel scans an entire DynamoDB table, putting all the output records to a
@@ -229,4 +242,8 @@ func (h *AwsHelper) ChannelToTable(tableName string, batchSize int64, waitPeriod
 		}
 	}
 	h.Wg.Done()
+}
+
+func (h *AwsHelper) GetCredentials(accountID, accountRole string) {
+
 }
