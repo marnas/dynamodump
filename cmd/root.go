@@ -24,16 +24,21 @@ import (
 )
 
 var (
-	dynamoTableName     string
-	dynamoBatchSize     int64
-	dynamoAppendRestore bool
-	dynamoTableRegion   string
-	forceRestore        bool
-	s3BucketName        string
-	s3BucketFolderName  string
-	s3BucketRegion      string
-	s3DateSuffix        bool
-	waitTime            int64
+	awsProfile           string
+	dynamoTableAccountID string
+	dynamoTableName      string
+	dynamoTableRole      string
+	dynamoBatchSize      int64
+	dynamoAppendRestore  bool
+	dynamoTableRegion    string
+	forceRestore         bool
+	s3BucketAccountID    string
+	s3BucketName         string
+	s3BucketFolderName   string
+	s3BucketRegion       string
+	s3BucketRole         string
+	s3DateSuffix         bool
+	waitTime             int64
 )
 
 var rootCmd = &cobra.Command{
