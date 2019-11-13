@@ -1,13 +1,24 @@
-FROM golang:alpine
+# GitHub:       https://github.com/AltoStack/dynamodump
+# Twitter:      https://twitter.com/AltoStack
+# Website:      https://altostack.io/
 
-WORKDIR /go/src/dynamodbdump
-COPY glide.yaml *.go /go/src/dynamodbdump/
+FROM golang:alpine AS build
+
+ENV GOOS=linux
+
+WORKDIR /go/src/github.com/AltoStack/dynamodump
+COPY . /go/src/github.com/AltoStack/dynamodump/
 
 RUN apk update \
-    && apk add --no-cache git \
-    && go get github.com/Masterminds/glide \
-    && go install github.com/Masterminds/glide \
-    && glide install --strip-vendor
-RUN go-wrapper install
+    && apk add --no-cache gcc g++ git make
 
-CMD ["go-wrapper", "run"]
+RUN make install
+
+# ---
+
+FROM golang:alpine
+
+COPY --from=build /go/bin/dynamodump /usr/bin/dynamodump
+
+ENTRYPOINT ["dynamodump"]
+CMD ["--help"]
