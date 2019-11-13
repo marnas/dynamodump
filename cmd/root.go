@@ -24,11 +24,14 @@ import (
 )
 
 var (
+	crossRegions        bool
 	dynamoTableName     string
 	dynamoBatchSize     int64
 	dynamoAppendRestore bool
+	dynamoTableRegion   string
 	s3BucketName        string
 	s3BucketFolderName  string
+	s3BucketRegion      string
 	s3DateSuffix        bool
 	waitTime            int64
 )
