@@ -23,8 +23,9 @@ import (
 	"github.com/AltoStack/dynamodump/core"
 )
 
-func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, appendToTable bool) {
-	proc := core.NewAwsHelper("")
+func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, appendToTable bool, dynamoRegion, s3Region string) {
+	proc := core.NewAwsHelper(dynamoRegion)
+	dest := core.NewAwsHelper(s3Region)
 
 	// Check if the table exists and has data in it. If so, abort
 	itemsCount, err := proc.CheckTableEmpty(tableName)
@@ -41,7 +42,7 @@ func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, b
 	}
 
 	// Check if a file "_SUCCESS" is present in the directory
-	if exists, err := proc.ExistsInS3(bucket, fmt.Sprintf("%s/_SUCCESS", prefix)); !exists {
+	if exists, err := dest.ExistsInS3(bucket, fmt.Sprintf("%s/_SUCCESS", prefix)); !exists {
 		switch {
 		case err != nil:
 			log.Fatalf("[ERROR] Unable to retrieve the _SUCCESS flag information: %s\nAborting...\n", err)
@@ -51,7 +52,7 @@ func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, b
 	}
 
 	// Pull the manifest from s3 and load it to memory
-	err = proc.LoadManifestFromS3(bucket, fmt.Sprintf("%s/manifest", prefix))
+	err = dest.LoadManifestFromS3(bucket, fmt.Sprintf("%s/manifest", prefix))
 	if err != nil {
 		log.Fatalf("[ERROR] Unable to load the manifest flag information: %s\nAborting...\n", err)
 	}
