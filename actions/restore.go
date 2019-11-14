@@ -24,11 +24,11 @@ import (
 )
 
 func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, appendToTable bool, dynamoRegion, s3Region string) {
-	proc := core.NewAwsHelper(dynamoRegion)
-	dest := core.NewAwsHelper(s3Region)
+	proc := core.NewAwsHelper(s3Region)
+	dest := core.NewAwsHelper(dynamoRegion)
 
 	// Check if the table exists and has data in it. If so, abort
-	itemsCount, err := proc.CheckTableEmpty(tableName)
+	itemsCount, err := dest.CheckTableEmpty(tableName)
 	if err != nil {
 		log.Fatalf("[ERROR] Unable to retrieve the target table informations: %s\nAborting...\n", err)
 	}
@@ -42,7 +42,7 @@ func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, b
 	}
 
 	// Check if a file "_SUCCESS" is present in the directory
-	if exists, err := dest.ExistsInS3(bucket, fmt.Sprintf("%s/_SUCCESS", prefix)); !exists {
+	if exists, err := proc.ExistsInS3(bucket, fmt.Sprintf("%s/_SUCCESS", prefix)); !exists {
 		switch {
 		case err != nil:
 			log.Fatalf("[ERROR] Unable to retrieve the _SUCCESS flag information: %s\nAborting...\n", err)
@@ -52,13 +52,13 @@ func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, b
 	}
 
 	// Pull the manifest from s3 and load it to memory
-	err = dest.LoadManifestFromS3(bucket, fmt.Sprintf("%s/manifest", prefix))
+	err = proc.LoadManifestFromS3(bucket, fmt.Sprintf("%s/manifest", prefix))
 	if err != nil {
 		log.Fatalf("[ERROR] Unable to load the manifest flag information: %s\nAborting...\n", err)
 	}
 
 	// For each file in the manifest pull the file, decode each line and add them to a batch and push them into the table (batch size, then wait and continue)
-	err = proc.S3ToDynamo(tableName, batchSize, waitPeriod)
+	err = dest.S3ToDynamo(tableName, batchSize, waitPeriod)
 	if err != nil {
 		log.Fatalf("[ERROR] Unable to import the full s3 actions to Dynamo: %s\nAborting...\n", err)
 	}
