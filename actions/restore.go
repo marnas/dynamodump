@@ -57,8 +57,9 @@ func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, b
 		log.Fatalf("[ERROR] Unable to load the manifest flag information: %s\nAborting...\n", err)
 	}
 
+	dest.ManifestS3 = proc.ManifestS3
 	// For each file in the manifest pull the file, decode each line and add them to a batch and push them into the table (batch size, then wait and continue)
-	err = dest.S3ToDynamo(tableName, batchSize, waitPeriod)
+	err = proc.S3ToDynamo(tableName, batchSize, waitPeriod, dest)
 	if err != nil {
 		log.Fatalf("[ERROR] Unable to import the full s3 actions to Dynamo: %s\nAborting...\n", err)
 	}
