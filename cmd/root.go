@@ -28,6 +28,7 @@ var (
 	dynamoBatchSize     int64
 	dynamoAppendRestore bool
 	dynamoTableRegion   string
+	forceRestore        bool
 	s3BucketName        string
 	s3BucketFolderName  string
 	s3BucketRegion      string

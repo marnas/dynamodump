@@ -30,6 +30,7 @@ func init() {
 	restoreCmd.Flags().Int64VarP(&dynamoBatchSize, "dynamo-table-batch-size", "s", 1000, "Max number of records to read from the Dynamo table at once. Environment variable: DYN_DYNAMO_TABLE_BATCH_SIZE")
 	restoreCmd.Flags().StringVarP(&dynamoTableRegion, "dynamo-table-region", "o", "", "AWS region of the Dynamo table. Environment variable: DYN_DYNAMO_TABLE_REGION (required)")
 	restoreCmd.Flags().BoolVarP(&dynamoAppendRestore, "dynamo-append-restore", "a", false, "Appends the rows to a non-empty table when restoring instead of aborting. Environment variable: DYN_DYNAMO_RESTORE_APPEND")
+	restoreCmd.Flags().BoolVarP(&forceRestore, "force-restore", "p", false, "Force restore even if the _SUCCESS file is absent")
 	restoreCmd.Flags().Int64VarP(&waitTime, "dynamo-table-batch-wait-time", "w", 100, "Number of milliseconds to wait between batches. If a ProvisionedThroughputExceededException is encountered, "+
 		"the script will wait twice that amount of time before retrying. Environment variable: DYN_WAIT_TIME")
 	restoreCmd.Flags().StringVarP(&s3BucketName, "s3-bucket-name", "b", "", "Name of the S3 bucket where to put the actions. Environment variable: DYN_S3_BUCKET_NAME (required)")
@@ -47,6 +48,6 @@ var restoreCmd = &cobra.Command{
 	Use:   "restore",
 	Short: "Restore a DynamoDB Table from S3",
 	Run: func(cmd *cobra.Command, args []string) {
-		actions.TableRestore(dynamoTableName, dynamoBatchSize, time.Duration(waitTime)*time.Millisecond, s3BucketName, s3BucketFolderName, dynamoAppendRestore, dynamoTableRegion, s3BucketRegion)
+		actions.TableRestore(dynamoTableName, dynamoBatchSize, time.Duration(waitTime)*time.Millisecond, s3BucketName, s3BucketFolderName, dynamoAppendRestore, forceRestore, dynamoTableRegion, s3BucketRegion)
 	},
 }
