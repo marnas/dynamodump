@@ -211,7 +211,7 @@ func (h *AwsHelper) batchToTable(wRequest map[string][]*dynamodb.WriteRequest, w
 }
 
 // ChannelToTable puts the data from the channel into the given Dynamo table
-func (h *AwsHelper) ChannelToTable(tableName string, batchSize int64, waitPeriod time.Duration) {
+func (h *AwsHelper) ChannelToTable(tableName string, batchSize int64, waitPeriod time.Duration, destination *AwsHelper) {
 	var currentIdx int64
 	currentIdx = 0
 	for {
@@ -221,7 +221,7 @@ func (h *AwsHelper) ChannelToTable(tableName string, batchSize int64, waitPeriod
 			break // Leaves if the queue is closed and no items were found
 		}
 		log.Printf("Sending %d items\n", reqSize)
-		h.batchToTable(map[string][]*dynamodb.WriteRequest{tableName: dataReq}, waitPeriod*2)
+		destination.batchToTable(map[string][]*dynamodb.WriteRequest{tableName: dataReq}, waitPeriod*2)
 		currentIdx += int64(reqSize)
 		if currentIdx >= batchSize {
 			time.Sleep(waitPeriod)

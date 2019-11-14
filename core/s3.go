@@ -144,9 +144,9 @@ func (h *AwsHelper) ReaderToChannel(dataReader *io.ReadCloser) error {
 // S3ToDynamo pulls the s3 files from AwsHelper.ManifestS3 and import them
 // inside the given table using the given batch size (and wait period between
 // each batch)
-func (h *AwsHelper) S3ToDynamo(tableName string, batchSize int64, waitPeriod time.Duration) error {
+func (h *AwsHelper) S3ToDynamo(tableName string, batchSize int64, waitPeriod time.Duration, destination *AwsHelper) error {
 	var err error
-	go h.ChannelToTable(tableName, batchSize, waitPeriod)
+	go h.ChannelToTable(tableName, batchSize, waitPeriod, destination)
 	h.Wg.Add(1)
 	for _, entry := range h.ManifestS3.Entries {
 		u, _ := url.Parse(entry.URL)
