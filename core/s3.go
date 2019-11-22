@@ -110,7 +110,8 @@ func (h *AwsHelper) ExistsInS3(bucketName, s3Path string) (bool, error) {
 
 // UploadToS3 writes the content of a bytes array to the given s3 path
 func (h *AwsHelper) UploadToS3(bucketName, s3Key string, data []byte) {
-	uploader := s3manager.NewUploader(h.AwsSession)
+	svc := h.CreateServiceClientValue()
+	uploader := s3manager.NewUploaderWithClient(svc)
 
 	upParams := &s3manager.UploadInput{
 		Bucket:               aws.String(bucketName),
