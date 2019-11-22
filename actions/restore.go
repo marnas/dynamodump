@@ -23,7 +23,7 @@ import (
 	"github.com/AltoStack/dynamodump/core"
 )
 
-func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, appendToTable bool, dynamoRegion, s3Region string) {
+func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, appendToTable, forceRestore bool, dynamoRegion, s3Region string) {
 	proc := core.NewAwsHelper(s3Region)
 	dest := core.NewAwsHelper(dynamoRegion)
 
@@ -47,7 +47,14 @@ func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, b
 		case err != nil:
 			log.Fatalf("[ERROR] Unable to retrieve the _SUCCESS flag information: %s\nAborting...\n", err)
 		case !exists:
-			log.Fatalf("[ERROR] Unable to find a _SUCCESS flag in the provided folder. Are you sure the actions was successful?\nAborting...\n")
+			if forceRestore {
+				log.Println("[WARNING] _SUCCESS flag is missing, data may not be accurate")
+				log.Println("[WARNING] -force-restore flag enabled, continue..")
+			} else {
+				log.Println("[ERROR] Unable to find a _SUCCESS flag in the provided folder. Are you sure the actions was successful?")
+				log.Println("[ERROR] Please enable -force-restore flag if you wish to continue anyway")
+				log.Fatalf("[ERROR] Aborting...")
+			}
 		}
 	}
 
