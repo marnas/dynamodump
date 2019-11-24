@@ -65,7 +65,7 @@ type AwsHelper struct {
 // objects like a channel or a DynamoDB client
 func NewAwsHelper(profile, region, accountID, accountRole string) *AwsHelper {
 	awsSess, err := session.NewSessionWithOptions(session.Options{
-		// Specify profile to load for the session's config - temporarily commented out
+		// Specify profile to load for the session's config
 		Profile: profile,
 
 		// Provide SDK Config options, such as Region.
@@ -242,8 +242,4 @@ func (h *AwsHelper) ChannelToTable(tableName string, batchSize int64, waitPeriod
 		}
 	}
 	h.Wg.Done()
-}
-
-func (h *AwsHelper) GetCredentials(accountID, accountRole string) {
-
 }
