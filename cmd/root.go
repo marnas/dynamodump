@@ -24,19 +24,17 @@ import (
 )
 
 var (
-	awsProfile           string
 	dynamoTableAccountID string
 	dynamoTableName      string
-	dynamoTableRole      string
 	dynamoBatchSize      int64
 	dynamoAppendRestore  bool
 	dynamoTableRegion    string
 	forceRestore         bool
+	roleAssumed          string
 	s3BucketAccountID    string
 	s3BucketName         string
 	s3BucketFolderName   string
 	s3BucketRegion       string
-	s3BucketRole         string
 	s3DateSuffix         bool
 	waitTime             int64
 )

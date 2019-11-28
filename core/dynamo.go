@@ -63,11 +63,8 @@ type AwsHelper struct {
 
 // NewAwsHelper creates a new AwsHelper, initializing an AWS session and a few
 // objects like a channel or a DynamoDB client
-func NewAwsHelper(profile, region, accountID, accountRole string) *AwsHelper {
+func NewAwsHelper(region, accountID, accountRole string) *AwsHelper {
 	awsSess, err := session.NewSessionWithOptions(session.Options{
-		// Specify profile to load for the session's config
-		Profile: profile,
-
 		// Provide SDK Config options, such as Region.
 		Config: aws.Config{
 			Region: aws.String(region),
