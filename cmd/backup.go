@@ -28,8 +28,11 @@ func init() {
 
 	backupCmd.Flags().StringVarP(&dynamoTableName, "dynamo-table-name", "t", "", "Name of the Dynamo table to actions. Environment variable: DYN_DYNAMO_TABLE_NAME (required)")
 	backupCmd.Flags().Int64VarP(&dynamoBatchSize, "dynamo-table-batch-size", "s", 1000, "Max number of records to read from the Dynamo table at once. Environment variable: DYN_DYNAMO_TABLE_BATCH_SIZE")
+	backupCmd.Flags().StringVarP(&dynamoTableAccountID, "dynamo-table-account-id", "x", "", "AccountID that will be used to access the dynamoDB")
 	backupCmd.Flags().StringVarP(&dynamoTableRegion, "dynamo-table-region", "o", "", "AWS region of the Dynamo table. Environment variable: DYN_DYNAMO_TABLE_REGION (required)")
 	backupCmd.Flags().Int64VarP(&waitTime, "dynamo-table-batch-wait-time", "w", 100, "Number of milliseconds to wait between batches. Environment variable: DYN_WAIT_TIME")
+	backupCmd.Flags().StringVarP(&roleAssumed, "assume-role", "g", "OrganizationAccountAccessRole", "Role that will be used to access the s3 Bucket")
+	backupCmd.Flags().StringVarP(&s3BucketAccountID, "s3-bucket-account-id", "e", "", "AccountID that will be used to access the s3 Bucket")
 	backupCmd.Flags().StringVarP(&s3BucketName, "s3-bucket-name", "b", "", "Name of the S3 bucket where to put the actions. Environment variable: DYN_S3_BUCKET_NAME (required)")
 	backupCmd.Flags().StringVarP(&s3BucketRegion, "s3-bucket-region", "d", "", "AWS region of the s3 Bucket. Environment variable: DYN_S3_BUCKET_REGION (required)")
 	backupCmd.Flags().StringVarP(&s3BucketFolderName, "s3-bucket-folder-name", "f", "", "Path inside the S3 bucket where to put actions. Environment variable: DYN_S3_BUCKET_FOLDER_NAME (required)")
@@ -46,6 +49,6 @@ var backupCmd = &cobra.Command{
 	Use:   "backup",
 	Short: "Backup a DynamoDB Table to S3",
 	Run: func(cmd *cobra.Command, args []string) {
-		actions.TableBackup(dynamoTableName, dynamoBatchSize, time.Duration(waitTime)*time.Millisecond, s3BucketName, s3BucketFolderName, s3DateSuffix, dynamoTableRegion, s3BucketRegion)
+		actions.TableBackup(dynamoTableName, dynamoBatchSize, time.Duration(waitTime)*time.Millisecond, s3BucketName, s3BucketFolderName, s3DateSuffix, dynamoTableRegion, roleAssumed, s3BucketAccountID, s3BucketRegion)
 	},
 }

@@ -23,9 +23,9 @@ import (
 	"github.com/AltoStack/dynamodump/core"
 )
 
-func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, appendToTable, forceRestore bool, dynamoRegion, s3Region string) {
-	proc := core.NewAwsHelper(s3Region)
-	dest := core.NewAwsHelper(dynamoRegion)
+func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, appendToTable, forceRestore bool, dynamoAccountID, dynamoRegion, roleAssumed, s3AccountID, s3Region string) {
+	proc := core.NewAwsHelper(s3Region, s3AccountID, "")
+	dest := core.NewAwsHelper(dynamoRegion, dynamoAccountID, roleAssumed)
 
 	// Check if the table exists and has data in it. If so, abort
 	itemsCount, err := dest.CheckTableEmpty(tableName)

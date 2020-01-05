@@ -24,7 +24,7 @@ import (
 
 // Table manages the consumer from a given DynamoDB table and a producer
 // to a given s3 bucket
-func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, addDate bool, dynamoRegion, s3Region string) {
+func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, addDate bool, dynamoRegion, roleAssumed, s3AccountID, s3Region string) {
 	if addDate {
 		t := time.Now().UTC()
 		prefix += "/" + t.Format("2006-01-02-15-04-05")
@@ -34,8 +34,8 @@ func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bu
 		log.Fatal("Error. Missing fields dynamoRegion or s3Region")
 	}
 
-	proc := core.NewAwsHelper(dynamoRegion)
-	dest := core.NewAwsHelper(s3Region)
+	proc := core.NewAwsHelper(dynamoRegion, "", "")
+	dest := core.NewAwsHelper(s3Region, s3AccountID, roleAssumed)
 
 	go proc.ChannelToS3(bucket, prefix, 10*1024*1024, dest)
 
