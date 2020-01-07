@@ -72,9 +72,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&s3BucketFolderName, "s3-bucket-folder-name", "f", "", "Path inside the S3 bucket where to put actions. Environment variable: DYN_S3_BUCKET_FOLDER_NAME (required)")
 	rootCmd.PersistentFlags().StringVarP(&s3BucketRegion, "s3-bucket-region", "d", "", "AWS region of the s3 Bucket. Environment variable: DYN_S3_BUCKET_REGION (required)")
 
-	rootCmd.MarkFlagRequired("dynamo-table-name")
-	rootCmd.MarkFlagRequired("dynamo-table-region")
-	rootCmd.MarkFlagRequired("s3-bucket-name")
-	rootCmd.MarkFlagRequired("s3-bucket-region")
-	rootCmd.MarkFlagRequired("s3-bucket-folder-name")
+	rootCmd.MarkPersistentFlagRequired("dynamo-table-name")
+	rootCmd.MarkPersistentFlagRequired("dynamo-table-region")
+	rootCmd.MarkPersistentFlagRequired("s3-bucket-name")
+	rootCmd.MarkPersistentFlagRequired("s3-bucket-region")
+	rootCmd.MarkPersistentFlagRequired("s3-bucket-folder-name")
 }
