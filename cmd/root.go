@@ -16,11 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"strings"
+	"log"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -52,20 +50,15 @@ var rootCmd = &cobra.Command{
   `,
 }
 
-// Execute executes the root command.
-func Execute() error {
-	return rootCmd.Execute()
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func init() {
-	cobra.OnInitialize(func() {
-		viper.SetEnvPrefix("dyn") // prefix that ENVIRONMENT variables will use.
-		viper.AutomaticEnv()      // read in environment variables that match
-		viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-
-		postInitCommands(rootCmd.Commands())
-	})
-
 	// Defining persistent flags, which
 	// will be global for the application.
 	rootCmd.PersistentFlags().StringVarP(&dynamoTableName, "dynamo-table-name", "t", "", "Name of the Dynamo table to actions. Environment variable: DYN_DYNAMO_TABLE_NAME (required)")
@@ -84,22 +77,4 @@ func init() {
 	rootCmd.MarkFlagRequired("s3-bucket-name")
 	rootCmd.MarkFlagRequired("s3-bucket-region")
 	rootCmd.MarkFlagRequired("s3-bucket-folder-name")
-}
-
-func postInitCommands(commands []*cobra.Command) {
-	for _, cmd := range commands {
-		presetRequiredFlags(cmd)
-		if cmd.HasSubCommands() {
-			postInitCommands(cmd.Commands())
-		}
-	}
-}
-
-func presetRequiredFlags(cmd *cobra.Command) {
-	viper.BindPFlags(cmd.Flags())
-	cmd.Flags().VisitAll(func(f *pflag.Flag) {
-		if viper.IsSet(f.Name) && viper.GetString(f.Name) != "" {
-			cmd.Flags().Set(f.Name, viper.GetString(f.Name))
-		}
-	})
 }
