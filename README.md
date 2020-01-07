@@ -75,8 +75,8 @@ export AWS_PROFILE=awesome-profile
 ## Todo
 
 - [x] Cross Region Support (DynamoDB Table and S3 Bucket can be in different AWS regions)
-- [ ] Cross Account Support (DynamoDB Table and S3 Bucket can be in different AWS accounts)
-- [ ] Flag to force restore even if the `_SUCCESS` file is absent (Warn data may not be accurate)
+- [x] Cross Account Support (DynamoDB Table and S3 Bucket can be in different AWS accounts)
+- [x] Flag to force restore even if the `_SUCCESS` file is absent (Warn data may not be accurate)
 - [ ] Ability to define S3 `StorageClass` of backed up files
 - [ ] Ability to backup all DynamoDB Tables (Based on AWS Tags)
 - [ ] Ability to discover DynamoDB Tables (Based on AWS Tags)
