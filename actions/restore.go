@@ -24,8 +24,8 @@ import (
 )
 
 func TableRestore(tableName string, batchSize int64, waitPeriod time.Duration, bucket, prefix string, appendToTable, forceRestore bool, dynamoAccountID, dynamoRegion, roleAssumed, s3AccountID, s3Region string) {
-	proc := core.NewAwsHelper(s3Region, s3AccountID, "")
-	dest := core.NewAwsHelper(dynamoRegion, dynamoAccountID, roleAssumed)
+	proc := core.NewSession(s3Region, s3AccountID, "")
+	dest := core.NewSession(dynamoRegion, dynamoAccountID, roleAssumed)
 
 	// Check if the table exists and has data in it. If so, abort
 	itemsCount, err := dest.CheckTableEmpty(tableName)

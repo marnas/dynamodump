@@ -34,8 +34,8 @@ func TableBackup(tableName string, batchSize int64, waitPeriod time.Duration, bu
 		log.Fatal("Error. Missing fields dynamoRegion or s3Region")
 	}
 
-	proc := core.NewAwsHelper(dynamoRegion, "", "")
-	dest := core.NewAwsHelper(s3Region, s3AccountID, roleAssumed)
+	proc := core.NewSession(dynamoRegion, "", "")
+	dest := core.NewSession(s3Region, s3AccountID, roleAssumed)
 
 	go proc.ChannelToS3(bucket, prefix, 10*1024*1024, dest)
 
